@@ -1,4 +1,5 @@
 const classModel = require("../models/class");
+const userModel = require("../models/user");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const router = require("express").Router();
@@ -18,7 +19,7 @@ async function createClass(req, res) {
 
 async function getClass(req, res) {
 	try {
-		const classID = req.param.classID;
+		const classID = req.params.classID;
 		const classData = await classModel.findById(classID);
 		if (!classData) {
 			return res.status(404).send(`This class does not exist.`);
@@ -32,14 +33,11 @@ async function getClass(req, res) {
 	}
 }
 
-async function getUserClasses(req, res) {
+async function getClasses(req, res) {
 	try {
-		const userID = req.body.userID;
-		const classesList = await classModel.find(userID);
+		const classesList = await classModel.find();
 		if (!classesList) {
-			return res
-				.status(404)
-				.send(`This user hasn't joined any classes yet`);
+			return res.status(404).send(`Couldn't find any classes`);
 		}
 		res.send({
 			data: classesList,
@@ -50,12 +48,65 @@ async function getUserClasses(req, res) {
 	}
 }
 
-async function updateClass(req, res) {}
+async function getUserClasses(req, res) {
+	try {
+		const userID = req.params.userID;
+		const user = await userModel.findById(userID);
+
+		const classesList = await classModel.find();
+
+		let newClassList = [];
+		if (user.role === "Teacher" || user.role === "Student") {
+			classesList.forEach((classData) => {
+				if (
+					!classData.students.indexOf(userID) == -1 ||
+					classData.teacher == userID
+				) {
+					newClassList.push(classData);
+				}
+			});
+		} else {
+			newClassList = classesList.slice(0);
+		}
+
+		if (!classesList) {
+			return res
+				.status(404)
+				.send(`This user hasn't joined any classes yet`);
+		}
+		res.send({
+			data: newClassList,
+			message: "Classes Data found",
+		});
+	} catch (e) {
+		res.status(500).send(e);
+	}
+}
+
+async function updateClass(req, res) {
+	try {
+		const classID = req.params.classID;
+		const classData = await classModel.findById(classID);
+
+		if (!classData) {
+			return res.status(404).send(`This class does not exist!`);
+		}
+
+		const newClassData = req.body;
+
+		await classModel.findByIdAndUpdate(classID, newClassData);
+
+		res.status(200).send({ message: "Class Updated" });
+	} catch (e) {
+		res.status(500).send(e);
+	}
+}
 
 async function deleteClass(req, res) {}
 
 module.exports = {
 	getClass,
+	getClasses,
 	getUserClasses,
 	createClass,
 	updateClass,

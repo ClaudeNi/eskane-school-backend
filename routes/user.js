@@ -10,6 +10,7 @@ const {
 
 const {
 	getClass,
+	getClasses,
 	getUserClasses,
 	createClass,
 	updateClass,
@@ -18,8 +19,9 @@ const {
 
 //GET Methods
 router.get("/users", getUsers);
+router.get("/classes", getClasses);
 router.get("/classes/:userID", getUserClasses);
-router.get("/classes/:classID", getClass);
+router.get("/classes/class/:classID", getClass);
 router.get("/users/:userID", getUser);
 //POST Methods
 router.post("/users", createUser);
@@ -27,7 +29,7 @@ router.post("/classes", createClass);
 router.post("/users/login", authUser);
 //PATCH Methods
 router.patch("/users/:userID", updateUser);
-router.patch("/classes/:classID", updateClass);
+router.patch("/classes/class/:classID", updateClass);
 //DELETE Methods
 router.delete("/classes/:classID", deleteClass);
 
