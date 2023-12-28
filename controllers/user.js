@@ -4,23 +4,24 @@ const bcrypt = require("bcrypt");
 const router = require("express").Router();
 
 async function createUser(req, res) {
-	const user = await userModel.findOne({ email: req.body.email });
-	if (user) {
-		return res
-			.status(400)
-			.send({ message: "User with given email already exists" });
-	}
-	const newUser = await new userModel(req.body);
-
-	if (!validator.isEmail(newUser.email)) {
-		return res
-			.status(400)
-			.send({ message: `${newUser.email} is not a valid email` });
-	}
-
-	const salt = await bcrypt.genSalt(Number(process.env.SALT));
-	const hashPass = await bcrypt.hash(req.body.password, salt);
 	try {
+		const user = await userModel.findOne({ email: req.body.email });
+		if (user) {
+			return res
+				.status(400)
+				.send({ message: "User with given email already exists" });
+		}
+		const newUser = await new userModel(req.body);
+
+		if (!validator.isEmail(newUser.email)) {
+			return res
+				.status(400)
+				.send({ message: `${newUser.email} is not a valid email` });
+		}
+
+		const salt = await bcrypt.genSalt(Number(process.env.SALT));
+		const hashPass = await bcrypt.hash(req.body.password, salt);
+
 		await new userModel({ ...req.body, password: hashPass }).save();
 		res.status(201).send({ message: "Created a new user successfully" });
 	} catch (e) {
