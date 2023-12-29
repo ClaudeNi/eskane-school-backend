@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
 	phoneNumber: { type: String, required: true, unique: true, unique: true },
 	role: { type: String, required: true },
 	password: { type: String, required: true },
-	classes: { type: Array, required: true },
+	classes: [mongoose.Schema.Types.ObjectId],
 });
 
 userSchema.methods.generateAuthToken = function () {

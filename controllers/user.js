@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const router = require("express").Router();
 
 async function createUser(req, res) {
+	console.log(req.body);
 	try {
 		const user = await userModel.findOne({ email: req.body.email });
 		if (user) {
@@ -100,9 +101,7 @@ async function updateUser(req, res) {
 	const userID = req.params.userID;
 	const data = req.body;
 	try {
-		const user = await userModel.findByIdAndUpdate(userID, data, {
-			new: true,
-		});
+		await userModel.findByIdAndUpdate(userID, data);
 		res.send({ message: "User successfully updated." });
 	} catch (e) {
 		res.status(500).send(e);
