@@ -3,6 +3,7 @@ const userModel = require("../models/user");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const router = require("express").Router();
+const mongoose = require("mongoose");
 
 async function createClass(req, res) {
 	try {
@@ -59,8 +60,12 @@ async function getUserClasses(req, res) {
 		if (user.role === "Teacher" || user.role === "Student") {
 			classesList.forEach((classData) => {
 				if (
-					!classData.students.indexOf(userID) == -1 ||
-					classData.teacher == userID
+					classData.students.findIndex((x) => {
+						return x.id.equals(new mongoose.Types.ObjectId(userID));
+					}) !== -1 ||
+					classData.teacher.id.equals(
+						new mongoose.Types.ObjectId(userID)
+					)
 				) {
 					newClassList.push(classData);
 				}

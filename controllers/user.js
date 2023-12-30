@@ -4,7 +4,6 @@ const bcrypt = require("bcrypt");
 const router = require("express").Router();
 
 async function createUser(req, res) {
-	console.log(req.body);
 	try {
 		const user = await userModel.findOne({ email: req.body.email });
 		if (user) {
@@ -49,7 +48,6 @@ async function authUser(req, res) {
 		}
 		const token = user.generateAuthToken();
 		const id = user.id;
-		console.log(id);
 		res.status(200).send({
 			data: token,
 			id: id,
